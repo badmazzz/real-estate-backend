@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Serverless real estate backend'
+
+Resources:
+  CreateUserFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handlers/user.handlers.createUserHandler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        CreateUserApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+
+  GetUserFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handlers/user.handlers.getUserHandler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        GetUserApi:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: get
+
+  UpdateUserFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handlers/user.handlers.updateUserHandler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        UpdateUserApi:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: put
+
+  DeleteUserFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handlers/user.handlers.deleteUserHandler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        DeleteUserApi:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: delete
+
+  ListUsersFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handlers/user.handlers.listUsersHandler
+      Runtime: nodejs18.x
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        ListUsersApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: get
+
+  UsersTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: 'Users'
+      AttributeDefinitions:
+        - AttributeName: 'userId'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'userId'
+          KeyType: 'HASH'
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:
+  CreateUserFunctionArn:
+    Description: 'ARN of the createUser Lambda function'
+    Value: !GetAtt CreateUserFunction.Arn
+  GetUserFunctionArn:
+    Description: 'ARN of the getUser Lambda function'
+    Value: !GetAtt GetUserFunction.Arn
+  UpdateUserFunctionArn:
+    Description: 'ARN of the updateUser Lambda function'
+    Value: !GetAtt UpdateUserFunction.Arn
+  DeleteUserFunctionArn:
+    Description: 'ARN of the deleteUser Lambda function'
+    Value: !GetAtt DeleteUserFunction.Arn
+  ListUsersFunctionArn:
+    Description: 'ARN of the listUsers Lambda function'
+    Value: !GetAtt ListUsersFunction.Arn
